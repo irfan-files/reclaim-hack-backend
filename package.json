@@ -1,0 +1,35 @@
+{
+  "name": "backend-sc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "description": "",
+  "dependencies": {
+    "@pinata/sdk": "^2.1.0",
+    "@reclaimprotocol/js-sdk": "^1.3.11",
+    "@reclaimprotocol/zk-fetch": "0.1.4",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "js-base64": "^3.7.7",
+    "nft.storage": "^7.2.0",
+    "pinata": "^1.4.1",
+    "pinata-sdk": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.4",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  }
+}
