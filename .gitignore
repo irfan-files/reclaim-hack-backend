@@ -1,0 +1,61 @@
+# macOS system files
+.DS_Store
+*.DS_Store
+
+# Linux system files
+*.swp
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Logs
+logs
+*.log
+logs/**/*.log
+
+# Environment files
+.env
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+
+# Coverage directory used by testing tools
+coverage/
+
+# OS-generated files
+Thumbs.db
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE/editor-specific files
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs (WebStorm, PyCharm, etc.)
+.idea/
+
+# IntelliJ IDEA
+*.iml
+.idea/
+.idea_modules/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Miscellaneous files
+*.lock
+*.log
+
+# Upload files (specific to your project)
+uploadNFTindentity/
