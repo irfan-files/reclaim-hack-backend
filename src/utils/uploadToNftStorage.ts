@@ -20,12 +20,23 @@
 
 // src/utils/uploadToNftStorage.ts
 
+// src/utils/uploadToNftStorage.ts
+
+// src/utils/uploadToNftStorage.ts
+
+// src/utils/uploadToNftStorage.ts
+
 import { NFTStorage, File } from "nft.storage";
-import fs from "fs";
-import path from "path";
 
 const uploadToNftStorage = async (metadata: object): Promise<string> => {
-  const apiKey = process.env.NFT_STORAGE_API_KEY!;
+  const apiKey = process.env.NFT_STORAGE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "NFT_STORAGE_API_KEY is not defined in environment variables."
+    );
+  }
+
   const client = new NFTStorage({ token: apiKey });
 
   const blob = new Blob([JSON.stringify(metadata)], {
@@ -33,10 +44,15 @@ const uploadToNftStorage = async (metadata: object): Promise<string> => {
   });
   const file = new File([blob], "metadata.json");
 
-  const metadataCid = await client.storeDirectory([file]);
-  const tokenURI = `https://ipfs.io/ipfs/${metadataCid}/metadata.json`;
+  try {
+    const metadataCid = await client.storeDirectory([file]);
+    const tokenURI = `https://ipfs.io/ipfs/${metadataCid}/metadata.json`;
 
-  return tokenURI;
+    return tokenURI;
+  } catch (error) {
+    console.error("Error uploading metadata to NFT.Storage:", error);
+    throw new Error("Failed to upload metadata to NFT storage.");
+  }
 };
 
 export default uploadToNftStorage;
