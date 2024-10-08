@@ -222,6 +222,13 @@ app.get("/getmetadata", async (req: Request, res: Response) => {
   });
 });
 
+app.get("/tokenuri", async (req: Request, res: Response) => {
+  const tokenURIFilePath = path.join(__dirname, "tokenURI.json");
+  const tokenURI = JSON.parse(fs.readFileSync(tokenURIFilePath, "utf-8"));
+  return res.status(200).json({
+    tokenURI,
+  });
+
 // Helper function to fetch YouTube data
 async function fetchYouTubeData(access_token: string) {
   try {
