@@ -1,0 +1,23 @@
+{
+  "name": " YouTube Ownership NFT",
+  "description": "Proof of Owner for YouTube account: Noob Computer",
+  "image": "https://yt3.ggpht.com/ytc/AIdro_lzBF80GoySSej8whkh32vKCTBy6Tm_kihSxPkPSJGRTnU=s800-c-k-c0x00ffffff-no-rj",
+  "attributes": [
+    {
+      "trait_type": "Channel Name",
+      "value": "Noob Computer"
+    },
+    {
+      "trait_type": "Channel Data ID",
+      "value": "UC3i6u8kE9ibh2McfVUYZJcQ"
+    },
+    {
+      "trait_type": "Channel Data Image",
+      "value": "https://yt3.ggpht.com/ytc/AIdro_lzBF80GoySSej8whkh32vKCTBy6Tm_kihSxPkPSJGRTnU=s800-c-k-c0x00ffffff-no-rj"
+    },
+    {
+      "trait_type": "Proof",
+      "value": "0xbc0f76a81e370a37fd9d75a899abaad64086bd9ed707e2a261e7b4e1761e5965"
+    }
+  ]
+}
