@@ -6,12 +6,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { ReclaimClient } from "@reclaimprotocol/zk-fetch";
 import { Reclaim } from "@reclaimprotocol/js-sdk";
-import { ThirdwebSDK } from "@thirdweb-dev/sdk"; // Import Thirdweb SDK
-import { BaseSepoliaTestnet } from "@thirdweb-dev/chains";
+import uploadToWeb3Storage from "./utils/uploadToWeb3Storage";
 import path from "path";
-import { ethers } from "ethers"; // Correct
-
 import fs from "fs";
+import { SignedClaim, ProofData } from "./types";
 
 dotenv.config();
 
@@ -21,7 +19,7 @@ const requiredEnvVars = [
   "GOOGLE_REDIRECT_URI",
   "APP_ID",
   "APP_SECRET",
-  "THIRDWEB_API_KEY",
+  "WEB3_STORAGE_API_KEY",
 ];
 
 const missingEnvVars = requiredEnvVars.filter(
@@ -32,8 +30,6 @@ if (missingEnvVars.length > 0) {
   console.error(`Missing environment variables: ${missingEnvVars.join(", ")}`);
   process.exit(1);
 }
-
-const secretKey = process.env.THIRDWEB_API_KEY;
 
 const app = express();
 
@@ -52,10 +48,8 @@ const reclaimClient = new ReclaimClient(
   process.env.APP_SECRET!
 );
 
-// Initialize the Thirdweb SDK for metadata uploads
-const sdk = new ThirdwebSDK(BaseSepoliaTestnet, {
-  secretKey: secretKey,
-}); // No private key needed for just uploading
+const ABI_PATH = path.resolve(__dirname, "abi", "HealthyFood.json");
+const ABI = JSON.parse(fs.readFileSync(ABI_PATH, "utf8"));
 
 app.get("/", (_: Request, res: Response) => {
   res.send("HealthyFood NFT Backend is running");
@@ -102,7 +96,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
       }
     );
 
-    console.log("TOKEN RESPONS RECEIVED:", tokenResponse.data);
+    console.log("Token response received:", tokenResponse.data);
 
     const { access_token } = tokenResponse.data;
 
@@ -181,23 +175,23 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     const proofData = await Reclaim.transformForOnchain(proof);
 
     const proofdataIdentifier = proofData.signedClaim.claim.identifier;
-    console.log(`Proof Identifier:`, proofdataIdentifier);
+    console.log(`cok posisi`, proofdataIdentifier);
 
     const contextDataJson = proofData.claimInfo.context;
-    const data = JSON.parse(contextDataJson);
+    const data = JSON.parse(contextDataJson); // isi data channel , tittle , provider has
 
-    const imageMetadata =
-      youtubeResponse.data.items[0].snippet.thumbnails.high.url;
+    const imageMetadata = await youtubeResponse.data.items[0].snippet.thumbnails
+      .high.url;
     const contextData = data.extractedParameters.channelId;
     const youtubeTitle = data.extractedParameters.title;
 
-    console.log("Image URL:", imageMetadata);
+    console.log("gambarnya su", imageMetadata);
     console.log(`Extracted Proof Data - Channel ID: ${contextData}`);
 
     const metadata = {
-      name: `YouTube Ownership NFT`,
+      name: ` YouTube Ownership NFT`,
       description: `Proof of Owner for YouTube account: ${youtubeTitle}`,
-      image: `${imageMetadata}`,
+      image: `${imageMetadata}`, // Replace with your image URL
       attributes: [
         {
           trait_type: "Channel Name",
@@ -218,18 +212,23 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
       ],
     };
 
-    console.log("Metadata:", metadata);
+    const fs = require("fs");
+    const path = require("path");
 
-    // Upload metadata using Thirdweb's SDK
-    const storage = sdk.storage;
-    const uri = await storage.upload(metadata);
+    const metadataFilePath = path.join(__dirname, "metadata.json");
+    fs.writeFileSync(metadataFilePath, JSON.stringify(metadata, null, 2));
 
-    console.log("Token URI:", uri);
-    console.log("isi contextData", contextData);
+    console.log(`Metadata written to ${metadataFilePath}`);
+
+    console.log("NFT Metadata:", metadata);
+
+    const tokenURI = await uploadToWeb3Storage(metadata);
+
+    console.log("Token URI:", tokenURI);
 
     return res.status(200).json({
       channelId: contextData,
-      tokenURI: uri,
+      tokenURI,
     });
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
