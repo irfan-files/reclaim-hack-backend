@@ -213,22 +213,6 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
   }
 });
 
-// Step 3: Fetch metadata
-app.get("/getmetadata", async (req: Request, res: Response) => {
-  const metadataFilePath = path.join(__dirname, "metadata.json");
-  const metadata = JSON.parse(fs.readFileSync(metadataFilePath, "utf-8"));
-  return res.status(200).json({
-    metadata,
-  });
-});
-
-app.get("/tokenuri", async (req: Request, res: Response) => {
-  const tokenURIFilePath = path.join(__dirname, "tokenURI.json");
-  const tokenURI = JSON.parse(fs.readFileSync(tokenURIFilePath, "utf-8"));
-  return res.status(200).json({
-    tokenURI,
-  });
-
 // Helper function to fetch YouTube data
 async function fetchYouTubeData(access_token: string) {
   try {
