@@ -229,7 +229,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // );
 
     res.redirect(
-      `http://localhost:3000/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofDataIdentifier}&proof_claimInfo=${proofDataJSON}`
+      `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofDataIdentifier}&proof_claimInfo=${proofDataJSON}`
     );
   } catch (error) {
     console.error("Error in /oauth2callback:", error);
