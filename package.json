@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "[my-framework] build --output public",
+    "build": "tsc",
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts"
   },
