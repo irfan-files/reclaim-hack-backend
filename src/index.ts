@@ -33,7 +33,7 @@ const secretKey = process.env.THIRDWEB_API_KEY;
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.REDIRECT_FRONT_END_URL,
     methods: ["GET", "POST"],
     credentials: true,
   })
