@@ -21,6 +21,7 @@
     "ether": "^0.0.9",
     "ethers": "5.0.31",
     "express": "^4.19.2",
+    "google-auth-library": "^9.14.1",
     "js-base64": "^3.7.7",
     "node-fetch": "^3.3.2"
   },
