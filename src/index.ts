@@ -57,7 +57,7 @@ const oauth2Client = new OAuth2Client(
 );
 
 app.get("/", (_: Request, res: Response) => {
-  res.send("HealthyFood NFT Backend is running");
+  res.send("Proof youtube Nft using reclaim protocol Backend is running");
 });
 
 // Step 1: Redirect user to Google OAuth for authentication
@@ -203,6 +203,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     const proofDataJSON = JSON.stringify(proof);
 
     console.log("Proof Data Json:", proofDataJSON);
+    console.log("PROOF DATA PURE :", proofData);
 
     // Metadata for the NFT
     const metadata = {
