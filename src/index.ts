@@ -70,7 +70,7 @@ app.get("/auth", (req: Request, res: Response) => {
   res.redirect(redirectUri);
 });
 
-// Step 2: OAuth callback - exchange authorization code for access/refresh tokens
+// : OAuth callback - exchange authorization code for access/refresh tokens
 // app.get("/oauth2callback", async (req: Request, res: Response) => {
 //   const { code } = req.query;
 
