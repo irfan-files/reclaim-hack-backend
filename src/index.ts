@@ -33,7 +33,7 @@ const secretKey = process.env.THIRDWEB_API_KEY;
 const app = express();
 app.use(
   cors({
-    origin: process.env.REDIRECT_FRONT_END_URL,
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -57,7 +57,7 @@ const oauth2Client = new OAuth2Client(
 );
 
 app.get("/", (_: Request, res: Response) => {
-  res.send("Proof youtube Nft using reclaim protocol Backend is running");
+  res.send("Youtube Proof Ownership NFT Backend is running");
 });
 
 // Step 1: Redirect user to Google OAuth for authentication
@@ -70,82 +70,7 @@ app.get("/auth", (req: Request, res: Response) => {
   res.redirect(redirectUri);
 });
 
-// : OAuth callback - exchange authorization code for access/refresh tokens
-// app.get("/oauth2callback", async (req: Request, res: Response) => {
-//   const { code } = req.query;
-
-//   try {
-//     if (!code || typeof code !== "string") {
-//       return res.status(400).send("No authorization code provided.");
-//     }
-
-//     res.redirect(
-//       `http://localhost:3000/verify?code=${code}&redirect_uri=${encodeURIComponent(
-//         process.env.GOOGLE_REDIRECT_URI!
-//       )}`
-//     );
-//     const { tokens } = await oauth2Client.getToken(code);
-//     oauth2Client.setCredentials(tokens);
-
-//     storedRefreshToken = tokens.refresh_token || storedRefreshToken;
-
-//     const youtubeData = await fetchYouTubeData(tokens.access_token!);
-//     const channel = youtubeData.items[0];
-//     const channelId = channel.id;
-//     const channelTitle = channel.snippet.title;
-
-//     const proof = await reclaimClient.zkFetch(
-//       `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}`,
-//       {
-//         method: "GET",
-//       },
-//       {
-//         headers: { Authorization: `Bearer ${tokens.access_token}` },
-//         responseMatches: [
-//           {
-//             type: "regex",
-//             value:
-//               '"id":\\s*"(?<channelId>[^"]+)"[\\s\\S]*?"title":\\s*"(?<title>[^"]+)"',
-//           },
-//         ],
-//       }
-//     );
-
-//     if (!proof) {
-//       return res.status(400).send("Failed to generate proof.");
-//     }
-
-//     const isValid = await Reclaim.verifySignedProof(proof);
-//     if (!isValid) {
-//       return res.status(400).send("Proof is invalid.");
-//     }
-
-//     const proofData = await Reclaim.transformForOnchain(proof);
-//     const proofDataIdentifier = proofData.signedClaim.claim.identifier;
-//     const imageMetadata = channel.snippet.thumbnails.high.url;
-
-//     // Metadata for NFT
-//     const metadata = {
-//       name: `YouTube Ownership NFT`,
-//       description: `Proof of Owner for YouTube account: ${channelTitle}`,
-//       image: `${imageMetadata}`,
-//       attributes: [
-//         { trait_type: "Channel Name", value: channelTitle },
-//         { trait_type: "Channel Data ID", value: channelId },
-//         { trait_type: "Proof", value: proofDataIdentifier },
-//       ],
-//     };
-
-//     const storage = sdk.storage;
-//     const uri = await storage.upload(metadata);
-
-//     return res.status(200).json({ channelId, channelTitle, tokenURI: uri });
-//   } catch (error) {
-//     console.error("Error in /oauth2callback:", error);
-//     return res.status(500).send("Internal Server Error.");
-//   }
-// });
-
+// Step 2: OAuth callback - exchange authorization code for access/refresh tokens
 app.get("/oauth2callback", async (req: Request, res: Response) => {
   const { code } = req.query;
 
@@ -198,14 +123,20 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
 
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
-    const proofDataIdentifier = proofData.signedClaim.claim.identifier;
     const imageMetadata = channel.snippet.thumbnails.high.url;
-    const proofDataJSON = JSON.stringify(proof);
 
-    console.log("Proof Data Json:", proofDataJSON);
-    console.log("PROOF DATA PURE :", proofData);
+    // Prepare Proof Data Into Onchain
+    // proofData : claimInfo
+    const proofContext = proofData.claimInfo.context;
+    const proofParameters = proofData.claimInfo.parameters;
+    const proofProvider = proofData.claimInfo.provider;
+    // proofData : signedClaim
+    const proofEpoch = proofData.signedClaim.claim.epoch;
+    const proofIdentifier = proofData.signedClaim.claim.identifier;
+    const proofOwner = proofData.signedClaim.claim.owner;
+    const proofTimestampS = proofData.signedClaim.claim.timestampS;
+    const proofSignature = proofData.signedClaim.signatures[0];
 
-    // Metadata for the NFT
     const metadata = {
       name: `YouTube Ownership NFT`,
       description: `Proof of Owner for YouTube account: ${channelTitle}`,
@@ -213,7 +144,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
       attributes: [
         { trait_type: "Channel Name", value: channelTitle },
         { trait_type: "Channel Data ID", value: channelId },
-        { trait_type: "Proof", value: proofDataIdentifier },
+        { trait_type: "Proof", value: proofIdentifier },
       ],
     };
 
@@ -222,15 +153,11 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     const uri = await storage.upload(metadata);
 
     console.log("Token URI:", uri);
-
-    // After processing, redirect to the frontend with access token
-    // res.redirect(
-    //   `http://localhost:3000/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data=${proofDataIdentifier}`
-    // );
-
+    const url = `http://localhost:3000/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}`;
     res.redirect(
-      `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofDataIdentifier}&proof_claimInfo=${proofDataJSON}`
-    );
+          url
+        );
+    console.log(url)
   } catch (error) {
     console.error("Error in /oauth2callback:", error);
     res.status(500).send("Error during authentication process.");
