@@ -33,7 +33,7 @@ const secretKey = process.env.THIRDWEB_API_KEY;
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.REDIRECT_FRONT_END_URL,
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -151,13 +151,10 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Upload metadata using Thirdweb SDK
     const storage = sdk.storage;
     const uri = await storage.upload(metadata);
-
-    console.log("Token URI:", uri);
-    const url = `http://localhost:3000/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}`;
+    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}`;
     res.redirect(
           url
         );
-    console.log(url)
   } catch (error) {
     console.error("Error in /oauth2callback:", error);
     res.status(500).send("Error during authentication process.");
