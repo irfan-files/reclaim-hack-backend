@@ -124,6 +124,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
     const imageMetadata = channel.snippet.thumbnails.high.url;
+    const imageURL = `${imageMetadata}`;
 
     // Prepare Proof Data Into Onchain
     // proofData : claimInfo
@@ -136,11 +137,11 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     const proofOwner = proofData.signedClaim.claim.owner;
     const proofTimestampS = proofData.signedClaim.claim.timestampS;
     const proofSignature = proofData.signedClaim.signatures[0];
-
+    
     const metadata = {
       name: `YouTube Ownership NFT`,
       description: `Proof of Owner for YouTube account: ${channelTitle}`,
-      image: `${imageMetadata}`,
+      image: imageURL,
       attributes: [
         { trait_type: "Channel Name", value: channelTitle },
         { trait_type: "Channel Data ID", value: channelId },
@@ -151,7 +152,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Upload metadata using Thirdweb SDK
     const storage = sdk.storage;
     const uri = await storage.upload(metadata);
-    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}`;
+    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}&image_url=${imageURL}`;
     res.redirect(
           url
         );
