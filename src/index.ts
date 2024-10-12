@@ -90,6 +90,12 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     const channelId = channel.id;
     const channelTitle = channel.snippet.title;
 
+    // Fetch Youtube data for nft description
+    const channelSubscriber = channel.statistics.subscriberCount;
+    const channelViewCount = channel.statistics.viewCount;
+    const channelTotalVideo = channel.statistics.videoCount;
+    const channelPublisedAt = channel.snippet.publishedAt;
+
     // Generate proof using Reclaim protocol
     const proof = await reclaimClient.zkFetch(
       `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}`,
@@ -152,7 +158,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Upload metadata using Thirdweb SDK
     const storage = sdk.storage;
     const uri = await storage.upload(metadata);
-    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&proof_data_identifier=${proofIdentifier}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}&image_url=${imageURL}`;
+    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}&image_url=${imageURL}&channel_subscriber=${channelSubscriber}&channel_total_video=${channelTotalVideo}&channel_view_count=${channelViewCount}&channel_published_at=${channelPublisedAt}`
     res.redirect(
           url
         );
