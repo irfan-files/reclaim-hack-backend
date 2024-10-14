@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 import { ReclaimClient } from "@reclaimprotocol/zk-fetch";
 import { Reclaim } from "@reclaimprotocol/js-sdk";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -9,7 +10,7 @@ import { BaseSepoliaTestnet } from "@thirdweb-dev/chains";
 import { OAuth2Client } from "google-auth-library";
 
 dotenv.config();
-
+// const path = require('path');
 const requiredEnvVars = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
@@ -59,6 +60,8 @@ const oauth2Client = new OAuth2Client(
 app.get("/", (_: Request, res: Response) => {
   res.send("Youtube Proof Ownership NFT Backend is running");
 });
+
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 // Step 1: Redirect user to Google OAuth for authentication
 app.get("/auth", (req: Request, res: Response) => {
@@ -146,11 +149,9 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     
     const metadata = {
       name: `YouTube Ownership NFT`,
-      description: `Proof of Owner for YouTube account: ${channelTitle}`,
+      description: `Proof of Owner for YouTube account`,
       image: imageURL,
       attributes: [
-        { trait_type: "Channel Name", value: channelTitle },
-        { trait_type: "Channel Data ID", value: channelId },
         { trait_type: "Proof", value: proofIdentifier },
       ],
     };
