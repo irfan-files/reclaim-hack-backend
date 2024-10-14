@@ -132,8 +132,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
 
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
-    const imageMetadata = channel.snippet.thumbnails.high.url;
-    const imageURL = `${imageMetadata}`;
+    const imageURL = `https://www.youtubeapizkfetch.xyz/images/images.png`;
 
     // Prepare Proof Data Into Onchain
     // proofData : claimInfo
