@@ -132,7 +132,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
 
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
-    const imageURL = `https://www.youtubeapizkfetch.xyz/images/images.png`;
+    const imageURL = `https://www.youtubeapizkfetch.xyz/images/images.jpg`;
     
     // Information for nft attribute
     const proofIdentifier = proofData.signedClaim.claim.identifier;
