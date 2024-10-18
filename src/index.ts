@@ -133,18 +133,9 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
     const imageURL = `https://www.youtubeapizkfetch.xyz/images/images.png`;
-
-    // Prepare Proof Data Into Onchain
-    // proofData : claimInfo
-    const proofContext = proofData.claimInfo.context;
-    const proofParameters = proofData.claimInfo.parameters;
-    const proofProvider = proofData.claimInfo.provider;
-    // proofData : signedClaim
-    const proofEpoch = proofData.signedClaim.claim.epoch;
+    
+    // Information for nft attribute
     const proofIdentifier = proofData.signedClaim.claim.identifier;
-    const proofOwner = proofData.signedClaim.claim.owner;
-    const proofTimestampS = proofData.signedClaim.claim.timestampS;
-    const proofSignature = proofData.signedClaim.signatures[0];
     
     const metadata = {
       name: `YouTube Ownership NFT`,
@@ -158,7 +149,7 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     // Upload metadata using Thirdweb SDK
     const storage = sdk.storage;
     const uri = await storage.upload(metadata);
-    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&context=${proofContext}&parameters=${proofParameters}&provider=${proofProvider}&epoch=${proofEpoch}&identifier=${proofIdentifier}&owner=${proofOwner}&timestamp_s=${proofTimestampS}&signature=${proofSignature}&image_url=${imageURL}&channel_subscriber=${channelSubscriber}&channel_total_video=${channelTotalVideo}&channel_view_count=${channelViewCount}&channel_published_at=${channelPublisedAt}`
+    const url = `${process.env.REDIRECT_FRONT_END_URL}/oauth2callback/?access_token=${tokens.access_token}&channel_id=${channelId}&token_uri=${uri}&channel_title=${channelTitle}&identifier=${proofIdentifier}&image_url=${imageURL}&channel_subscriber=${channelSubscriber}&channel_total_video=${channelTotalVideo}&channel_view_count=${channelViewCount}&channel_published_at=${channelPublisedAt}&proofData=${encodeURIComponent(JSON.stringify(proofData))}`
     res.redirect(
           url
         );
