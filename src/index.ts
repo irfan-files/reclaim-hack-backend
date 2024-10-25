@@ -132,17 +132,21 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
 
     // Transform proof for on-chain purposes
     const proofData = await Reclaim.transformForOnchain(proof);
-    const imageURL = `https://www.youtubeapizkfetch.xyz/images/images.jpg`;
     
     // Information for nft attribute
     const proofIdentifier = proofData.signedClaim.claim.identifier;
+
+    // Tier Youtube
+    const tierData = await getTierYoutube(channelSubscriber);
+    const { tier, imageURL } = tierData;
     
     const metadata = {
-      name: `YouTube Ownership NFT`,
-      description: `Proof of Owner for YouTube account`,
+      name: `Creator Ownership NFT`,
+      description: `Proof of Owner for YouTube account by CreatorHub`,
       image: imageURL,
       attributes: [
         { trait_type: "Proof", value: proofIdentifier },
+        { trait_type: "Tier", value: tier },
       ],
     };
 
@@ -158,7 +162,6 @@ app.get("/oauth2callback", async (req: Request, res: Response) => {
     res.status(500).send("Error during authentication process.");
   }
 });
-
 // Helper function to fetch YouTube data
 async function fetchYouTubeData(access_token: string) {
   const youtubeResponse = await axios.get(
@@ -171,6 +174,26 @@ async function fetchYouTubeData(access_token: string) {
   return youtubeResponse.data;
 }
 
+// Get Tier Youtube
+async function getTierYoutube(subscriberCount: number) {
+  if (subscriberCount >= 10000000) {
+    const imageURL = `${process.env.PUBLIC_IMAGE_NFT}/platinum.jpg`;
+    const tier = 'Platinum';
+    return {tierChannel: tier , imageURL: imageURL};
+  } else if (subscriberCount >= 1000000 && subscriberCount < 10000000) {
+    const imageURL = `${process.env.PUBLIC_IMAGE_NFT}/gold.jpg`;
+    const tier = 'Gold';
+    return {tier, imageURL};
+  } else if (subscriberCount >= 10000 && subscriberCount < 1000000) {
+    const imageURL = `${process.env.PUBLIC_IMAGE_NFT}/silver.jpg`;
+    const tier = 'Silver';
+    return {tier, imageURL};
+  } else {
+    const imageURL = `${process.env.PUBLIC_IMAGE_NFT}/rookie.jpg`;
+    const tier = 'Rookie';
+    return {tier, imageURL};
+  }
+}
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Backend server is running on port ${PORT}`);
